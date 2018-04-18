@@ -19,7 +19,6 @@ if [ ! "$(docker ps -q -f name=$NAME)" ]; then
     -p 9072:9072/udp \
     -v /dockerdata/amule/config:/home/amule/.aMule \
     -v /dockerdata/amule/downloads:/incoming \
-    -v /dockerdata/amule/tmp:/temp \
     tchabaud/amule
 
 else
