@@ -4,45 +4,44 @@ This dockerfile is a copy of tchabaud/amule with some edits on the web pages
 # Configuration
 
 Create needed directories with
-
-mkdir -p ./amule/conf
-mkdir -p ./amule/tmp
-mkdir -p ./amule/incoming
+```sh
+mkdir -p <mount-point>/conf
+mkdir -p <mount-point>/tmp
+mkdir -p <mount-point>/incoming
 ```
 
 # Usage
 
-Just run the container with the following command lines (replace brackets with the values you want to use) :
-
-## Start from scratch
-
-If you don't have any existing amule configuration, you can specify a custom password for GUI and / or WebUI using adequate environment variables.
-
-- To use amule GUI as interface :
-
+Use following shell script to run the container
 ```sh
-docker run -p 4712:4712 -p 4662:4662 -p 4672:4672/udp \
-    -e PUID=[wanted_uid] -e PGID=[wanted_gid] \
-    -e GUI_PWD=[wanted_password_for_gui] \
-    -v ./amule/conf:/home/amule/.aMule -v ./amule/incoming:/incoming -v ./amule/tmp:/temp tchabaud/amule
+#!/bin/sh
+NAME=amule
+
+if [ ! "$(docker ps -q -f name=$NAME)" ]; then
+    echo "No running container with name $NAME"
+    if [ "$(docker ps -aq -f status=exited -f name=$NAME)" ]; then
+        echo "Found exited container, removing it now."
+        # cleanup
+        docker rm $NAME
+    fi
+    # run your container
+    echo "Starting container $NAME"
+
+    docker run -d \
+    --name $NAME \
+    --restart=unless-stopped \
+    -p 4811:4711 \
+    -p 9062:9062 \
+    -p 9072:9072/udp \
+    -v /dockerdata/amule/config:/home/amule/.aMule \
+    -v /dockerdata/amule/downloads:/incoming \
+    nielsteekens/amule
+
+else
+    echo "Active container with name $NAME found. Exiting"
+fi
 ```
 
-- To use web ui from a browser :
 
-```sh
-docker run -p 4711:4711 -p 4662:4662 -p 4672:4672/udp \
-    -e PUID=[wanted_uid] -e PGID=[wanted_gid] \
-    -e WEBUI_PWD=[wanted_password_for_web_interface] \
-    -v ./amule/conf:/home/amule/.aMule -v ./amule/incoming:/incoming -v ./amule/tmp:/temp tchabaud/amule
-```
-## Using an existing amule configuration
 
-Just mount existing directory as a volume :
-
-```sh
-docker run -p 4711:4711 -p 4662:4662 -p 4672:4672/udp \
-    -e PUID=[wanted_uid] -e PGID=[wanted_gid] \
-    -v ~/.aMule:/home/amule/.aMule -v ~/.aMule/Incoming:/incoming -v ~/.aMule/Temp:/temp tchabaud/amule
-```
-
-Then point your browser to http://localhost:4711
+Then point your browser to http://<dockerhost>:4711
