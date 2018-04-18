@@ -1,8 +1,10 @@
+# Introduction
+This dockerfile is a copy of tchabaud/amule with some edits on the web pages
+
 # Configuration
 
 Create needed directories with
 
-```sh
 mkdir -p ./amule/conf
 mkdir -p ./amule/tmp
 mkdir -p ./amule/incoming
