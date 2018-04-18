@@ -44,4 +44,4 @@ fi
 
 
 
-Then point your browser to http://<dockerhost>:4711
+Then point your browser to http://\<dockerhost\>:4711
